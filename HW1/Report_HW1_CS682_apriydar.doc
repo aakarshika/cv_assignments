@@ -1,0 +1,53 @@
+﻿Report: HW1 CS 682 
+Submitted by Aakarshika Priydarshi
+G01047156
+1. Environment:
+Python2.7
+OpenCV3.4
+Ubuntu16
+
+2. Grayscale.png: is the original image in grayscale.
+
+3. Image Transformations:
+
+Color_Transformation_1.png
+1. Switching color plane order from RGB (red-green-blue) to  RBG (red-green-blue). The colors blue and green are noticed to interchange having the same intensity as the original image, but red remains constant.
+
+Color_Transformation_2.png
+2. The color plane blue for all the pixels is kept constant at 100, giving the picture a blueish tint.
+
+Color_Transformation_3.png
+3. Color for blue is kept constant at 0. Which gives a yellow tint to the picture, because there is no blue to neutralize it.
+
+Filter2D_1.png
+4. Filter 2D convolution with kernel as a 5x5 matrix of 1s divided by 25. Blurs some noise.
+
+MedianBlurFilter_2.png
+5. Median Blur function with 5x5 matrix i.e. argument =5. Removes noise completely.
+
+Color_Extract.png
+6. The color blue is extracted by first converting the image from RGB to HSV and then applying threshold masks.
+
+Color_Exchange.png
+7. Threshold masks are applied to green color and inverse mask is created. This is used to find pixels that are green, and then replaced by constant color pixel red using numpy.
+
+Edge_detection_Canny.png
+8. For Grayscale image, edge is detected using Canny Edge detection.
+
+Edge_detection_Laplacian.png
+9. For this edge detection, first the image is blurred by Gaussian filter, then Laplacian Edge detection is applied, and finally contrast is increased using histograms.
+
+Hat.png
+10. Masks and image manipulation is subsequently used to take another image of a hat and its black background is removed. Face Cascade classifier is used to detect faces and then the hat mask is resized to fit the face dimensions. The hat is then added to the original image at appropriate position.
+
+4. Computer Vision Application
+Photonic Fence- This is an elaborate machine with cameras that tracks flying insects, identifies female mosquitoes that are likely to bite humans, and then uses a laser beam to kill them.
+http://www.intellectualventureslab.com/work/photonic-fence 
+
+This paper is entitled 'Computer Vision on Mars', published by NASA. It describes progress in the field of computer vision with planetary landers and spacecrafts. It is divided into 4 parts including stereo vision, and visual odometry for navigation and velocity estimation, noise reduction, slip perception and FPGA implementation for rover vision systems, and future opportunities as well as past reviews. 
+I found it interesting to be read, and hope to understand it someday.
+https://www.ri.cmu.edu/pub_files/pub4/matthies_larry_2007_1/matthies_larry_2007_1.pdf 
+Next interesting application for computer vision I would like to mention here is a fictional AI system 'The Machine' created by a character in the TV show Person of Interest. It takes data from the NSA's surveillance systems and determines if a lethal crime is about to take place.
+Although it is not real now, I hope that it will be in future.
+https://en.wikipedia.org/wiki/Person_of_Interest_(TV_series)#The_Machine 
+
