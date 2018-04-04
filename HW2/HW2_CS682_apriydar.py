@@ -26,6 +26,17 @@ original = img.copy()
 
 
 
+
+# hist_blue, bins = np.histogram(img[:][:][0], bins=256)
+# hist_green, _ = np.histogram(img[:][:][1], bins=256)
+# hist_red, _ = np.histogram(img[:][:][2], bins=256)
+
+# width = 0.25
+# center = (bins[:-1] + bins[1:]) / 2
+# plt.bar(center, hist_blue.ravel(), width=width, color = 'blue', label='Blue')
+# plt.bar(center+width, hist_green.ravel(), width=width, color = 'green', label='Green')
+# plt.bar(center+(width*2), hist_red.ravel(), width=width, color = 'red', label='Red')
+
 histr = cv2.calcHist([img],[0],None,[256],[0,256])
 plt.plot(histr,color = 'b')
 plt.xlim([0,256])
@@ -78,14 +89,17 @@ cv2.destroyAllWindows()
 
 histseq=[]
 i=0
-n=50
+n=99
 fig2=plt.figure(1)
 print '2.A. Loading images and calculating histograms...'
 
 for i in range (0,n):
-    path='images/ST2MainHall40'+str(i+20)+'.jpg'
+    if i<9:
+        path='images/ST2MainHall400'+str(i+1)+'.jpg'
+    else:
+        path='images/ST2MainHall40'+str(i+1)+'.jpg'
     t=cv2.imread(path)
-    im=cv2.resize(t,(640, 480))
+    im=cv2.resize(t,(640,480))
     # imgseq.append(im)
     print 'Saving histogram for image: ', path
     intensity = np.zeros([480,640], dtype=np.uint16)
@@ -97,21 +111,27 @@ for i in range (0,n):
     g=np.array(im[:,:,1] ,dtype=np.uint16 )
     b=np.array(im[:,:,0] ,dtype=np.uint16 )
 
-    intensity =    r*2 + g/4 + b/32 
+    # Change from previously submitted Homework
+    intensity =    ((r >> 5) << 6 ) + ( ( g >> 5 ) << 3) + ( b >> 5) 
 
-    
+    intensity_ravel =intensity.ravel()
 
-    histr = cv2.calcHist([intensity],[0],None,[512],[0,512])
+    histr , bins = np.histogram( intensity_ravel, 512)
+
     fig2.add_subplot(1,2,1)
-    plt.plot(histr,color = 'black')
+    plt.hist(intensity_ravel,bins=512,color = 'black')
+
+    #########################################
+
     plt.xlabel('Intensity')
     plt.ylabel('Pixels')
     plt.xlim([0,512])
 
     fig2.add_subplot(1,2,2)
     plt.imshow(im,interpolation='none')
-    plt.savefig('results/STMainHall40'+str(i+20)+'_histogram.png')
+    plt.savefig('results/STMainHall40'+str(i+1)+'_histogram.png')
     plt.gcf().clear()
+    # print histr
     histseq.append(histr)
 
 def histogram_intersection(h1,h2):
@@ -119,8 +139,8 @@ def histogram_intersection(h1,h2):
     sum_min=0.0
     sum_max=0.0
     for i in xrange(0,512):
-        hxi_1=h1[i][0]
-        hxi_2=h2[i][0]
+        hxi_1=h1[i]
+        hxi_2=h2[i]
 
         min_i = min(hxi_1,hxi_2)
         max_i = max(hxi_1,hxi_2)
@@ -138,8 +158,8 @@ def chi_squared_measure(h1,h2):
     sum_x_chi_sq=0.0
     for i in xrange(0,512):
 
-        hxi_1=h1[i][0]
-        hxi_2=h2[i][0]
+        hxi_1=h1[i]
+        hxi_2=h2[i]
 
         if hxi_2 + hxi_1 >0:
             e=( hxi_1 - hxi_2 ) * ( hxi_1 - hxi_2 ) / ( hxi_1 + hxi_2 )
@@ -156,25 +176,40 @@ fig = plt.figure(1)
 hi_arr = np.zeros((n,n), np.float)
 chisq_arr = np.zeros((n,n), np.float)
 
-for x in xrange(0,n):
+for x in xrange(-1,n):
     for y in xrange(0,x+1):
         hi_arr[x][y] = histogram_intersection(histseq[x],histseq[y])
         hi_arr[y][x] =  hi_arr[x][y]
         chisq_arr[x][y] =  chi_squared_measure(histseq[x],histseq[y])
         chisq_arr[y][x] =   chisq_arr[x][y]
-        print '2.B. Calculating histogram similarity for images: ',x,' ',y
+        print '2.B. Calculating histogram similarity for images: ',str(x+1),' ',str(y+1)
         print '\tHis Int = ',hi_arr[x][y]
         print '\tChi Sq = ',chisq_arr[x][y]
 
 
 
 
-graph = hi_arr*255.0
+
+# graph = hi_arr*255.0
+# g=np.array( graph,dtype=np.uint8 )
+
+# graph2 = chisq_arr
+# graph2 /= graph2.max()/256
+# g2 = np.array( graph2,dtype=np.uint8 )
+
+
+hi_min = hi_arr.min()
+hi_max = hi_arr.max()
+
+graph = (hi_arr-hi_min)*255.0/hi_max
 g=np.array( graph,dtype=np.uint8 )
 
-graph2 = chisq_arr
-graph2 /= graph2.max()/256
+chisq_min = chisq_arr.min()
+chisq_max = chisq_arr.max()
+
+graph2 = (chisq_arr-chisq_min)*255.0/chisq_max
 g2 = np.array( graph2,dtype=np.uint8 )
+
 
 p1=fig.add_subplot(121)
 plt.xlabel('Images')
